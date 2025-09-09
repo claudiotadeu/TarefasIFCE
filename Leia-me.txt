@@ -1,0 +1,5 @@
+Este Diretório, é exclusivamente para tarefas do IFCE.
+
+COMANDOS GIT
+
+git remote add Tarefas_IFCE https://github.com/claudiotadeu/Tarefas_IFCE.git

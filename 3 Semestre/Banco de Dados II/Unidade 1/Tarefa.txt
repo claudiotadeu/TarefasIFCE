@@ -1,0 +1,136 @@
+Nesta semana, vamos exercitar os conceitos: Consultas Aninhadas; Visões; triggers; e procedure stored.
+
+Comece escolhendo um tema (Temas).
+Calcular o valor gasto de clientes em pedidos de delivey.
+
+Crie um banco de dados com nome adequado para representar o seu problema.
+delivery
+
+Tabelas:
+	produtos (id, descricao, valor, situacao);
+	clientes (id, nome, endereco, situacao);
+	pedidosClientesProdutos (id, cliente_id, produtos_id, qtd, situacao)
+
+Crie uma visão com todos os dados da tabela principal e mais duas colunas com nomes apropriados para calcular a conta e a condição do seu problema. Exemplo: media e aprovacao.	
+	view_pedidosClientesProdutos (nome_cliente, produto, qtd, valor_unitario, valorTotal)
+
+Crie uma visão com todos os dados da tabela principal, filtrando somente um dos grupos da condição do seu problema. Exemplo: somente os estudantes aprovados.
+	view_pedidosClientesProdutos (cliente_id, qtd_pedidos, valorTotal, ticketMedio Where cliente.situacao=ativo)
+
+Crie uma trigger para limitar uma faixa de valores válidos para as variáveis do seu problema. Exemplo: as notas devem estar entre 0 e 10.
+	trigger= (antes de adcionar o pedido, verificar se tem em estoque)
+
+Crie um procedimento para calcular a média geral da turma.
+	(Calcular ticket medio por cliente)
+
+criar uma procedure que calcule o valor total faturado
+	calcule o valor total faturado
+
+
+
+Entregue um arquivo .sql.
+
+
+Tabela Clientes
+id		nome		endereco
+1		Claudio		Rua 1
+2		Maria		rua 2
+3		Joao		Rua 3
+4		Mariza		Rua 4
+5		Pedro		Rua 5
+6		Claudio		Rua 1
+7		Maria		rua 2
+8		Joao		Rua 3
+9		Mariza		Rua 4
+10		Pedro		Rua 5
+
+
+Tabela Produtos
+id	Descricao	Valor	Estoque
+1	Maça		5	30
+2	Banana		1	25
+3	Abacate		8	10
+
+
+DELIMITER //
+CREATE TRIGGER before_insert
+BEFORE INSERT ON pedidosClientesProdutos
+FOR EACH ROW
+BEGIN
+    DECLARE qtd_produtos INT;
+
+    -- Consulta a quantidade disponível do produto
+    SELECT estoque INTO qtd_produtos FROM produtos WHERE id_produto = NEW.id_produto;
+
+    -- Se a quantidade disponível for menor que o necessário, impede a transação
+    IF qtd_produtos < NEW.quantidade THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Quantidade insuficiente em estoque';
+    END IF;
+END//
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+__________________________________________________________
+DELIMITER //
+
+CREATE TRIGGER verificar_estoque
+BEFORE INSERT ON transacoes
+FOR EACH ROW
+BEGIN
+    DECLARE qtd_produtos INT;
+
+    -- Consulta a quantidade disponível do produto
+    SELECT quantidade INTO estoque
+    FROM produtos
+    WHERE id_produto = NEW.id_produto;
+
+    -- Se a quantidade disponível for menor que o necessário, impede a transação
+    IF qtd_produtos < NEW.quantidade THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Quantidade insuficiente em estoque';
+    END IF;
+END//
+
+DELIMITER ;
+
+
+
